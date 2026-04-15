@@ -60,10 +60,10 @@ resource "azurerm_firewall_policy_rule_collection_group" "fw_rules" {
   priority           = 100
 
   # --- DENY NETWORK RULES ---
-  # Runs at priority 50 - before the allow rules at 100
+  # Runs at priority 100 - before the allow rules 
   network_rule_collection {
     name     = "deny-network-rules"
-    priority = 50
+    priority = 100
     action   = "Deny"
 
     rule {
@@ -88,10 +88,10 @@ resource "azurerm_firewall_policy_rule_collection_group" "fw_rules" {
   }
 
   # --- DENY APPLICATION RULES ---
-  # Runs at priority 150 - before allow application rules at 200
+  # Runs at priority 300 - before allow application rules 
   application_rule_collection {
     name     = "deny-application-rules"
-    priority = 150
+    priority = 300
     action   = "Deny"
 
     rule {
@@ -128,7 +128,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "fw_rules" {
   # Control traffic by IP, port and protocol
   network_rule_collection {
     name     = "network-rules"
-    priority = 100
+    priority = 200
     action   = "Allow"
 
     rule {
@@ -152,7 +152,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "fw_rules" {
   # Control traffic by website address (FQDN)
   application_rule_collection {
     name     = "application-rules"
-    priority = 200
+    priority = 400
     action   = "Allow"
 
     rule {
