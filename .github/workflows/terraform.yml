@@ -13,9 +13,9 @@ env:
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
 jobs:
-  terraform:
+  # Job 1 - runs the plan and uploads it
+  plan:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,10 +26,40 @@ jobs:
       - name: Terraform init
         run: terraform init
 
+      - name: Terraform format check
+        run: terraform fmt -check
+
+      - name: Terraform validate
+        run: terraform validate
+
       - name: Terraform plan
         run: terraform plan -out=tfplan
 
-      # This step only runs on merges to main (not on PRs)
+      - name: Upload plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: tfplan
+
+  # Job 2 - waits for approval then applies
+  apply:
+    needs: plan                 # waits for plan job to finish first
+    runs-on: ubuntu-latest
+    environment: production     # this triggers the approval gate
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+
       - name: Terraform apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
