@@ -59,7 +59,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "fw_rules" {
   firewall_policy_id = azurerm_firewall_policy.fw_policy.id
   priority           = 100
 
-# --- DENY NETWORK RULES ---
+  # --- DENY NETWORK RULES ---
   # Runs at priority 50 - before the allow rules at 100
   network_rule_collection {
     name     = "deny-network-rules"
@@ -67,15 +67,15 @@ resource "azurerm_firewall_policy_rule_collection_group" "fw_rules" {
     action   = "Deny"
 
     rule {
-      name                  = "deny-malicious-ips"
-      protocols             = ["Any"]
-      source_addresses      = ["*"]
+      name             = "deny-malicious-ips"
+      protocols        = ["Any"]
+      source_addresses = ["*"]
       destination_addresses = [
-        "185.220.101.0/24",   # known tor exit nodes
-        "194.165.16.0/24",    # known malicious range
-        "45.142.212.0/24"     # known botnet range
+        "185.220.101.0/24", # known tor exit nodes
+        "194.165.16.0/24",  # known malicious range
+        "45.142.212.0/24"   # known botnet range
       ]
-      destination_ports     = ["*"]
+      destination_ports = ["*"]
     }
 
     rule {
