@@ -59,6 +59,71 @@ resource "azurerm_firewall_policy_rule_collection_group" "fw_rules" {
   firewall_policy_id = azurerm_firewall_policy.fw_policy.id
   priority           = 100
 
+# --- DENY NETWORK RULES ---
+  # Runs at priority 50 - before the allow rules at 100
+  network_rule_collection {
+    name     = "deny-network-rules"
+    priority = 50
+    action   = "Deny"
+
+    rule {
+      name                  = "deny-malicious-ips"
+      protocols             = ["Any"]
+      source_addresses      = ["*"]
+      destination_addresses = [
+        "185.220.101.0/24",   # known tor exit nodes
+        "194.165.16.0/24",    # known malicious range
+        "45.142.212.0/24"     # known botnet range
+      ]
+      destination_ports     = ["*"]
+    }
+
+    rule {
+      name                  = "deny-unauthorised-countries"
+      protocols             = ["Any"]
+      source_addresses      = ["10.0.0.0/16"]
+      destination_addresses = ["*"]
+      destination_ports     = ["*"]
+    }
+  }
+
+  # --- DENY APPLICATION RULES ---
+  # Runs at priority 150 - before allow application rules at 200
+  application_rule_collection {
+    name     = "deny-application-rules"
+    priority = 150
+    action   = "Deny"
+
+    rule {
+      name             = "deny-social-media"
+      source_addresses = ["10.0.0.0/16"]
+      protocols {
+        type = "Https"
+        port = 443
+      }
+      destination_fqdns = [
+        "*.facebook.com",
+        "*.twitter.com",
+        "*.tiktok.com",
+        "*.instagram.com"
+      ]
+    }
+
+    rule {
+      name             = "deny-malicious-sites"
+      source_addresses = ["10.0.0.0/16"]
+      protocols {
+        type = "Https"
+        port = 443
+      }
+      destination_fqdns = [
+        "*.malware.com",
+        "*.phishing.com",
+        "*.ransomware.com"
+      ]
+    }
+  }
+
   # --- NETWORK RULES ---
   # Control traffic by IP, port and protocol
   network_rule_collection {
