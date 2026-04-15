@@ -1,3 +1,5 @@
+# firewall rules updated
+
 provider "azurerm" {
   features {}
 }
