@@ -37,7 +37,7 @@ resource "azurerm_firewall" "fw" {
   resource_group_name = azurerm_resource_group.rg.name
   sku_name            = "AZFW_VNet"
   sku_tier            = "Standard"
-  firewall_policy_id  = azurerm_firewall_policy.fw_policy.id  # add this line
+  firewall_policy_id  = azurerm_firewall_policy.fw_policy.id # add this line
 
   ip_configuration {
     name                 = "fw-ipconfig"
